@@ -17,12 +17,15 @@ all_todos = [
 def index():
     return {"message": "Hello World!"}
 
-@api.get('/todos/{todo_id}')
+@api.get('/todos/{todo_id}') # path parameter - i provide the parameter in the path
 def get_todo(todo_id: int):
     for todo in all_todos:
         if todo['todo_id'] == todo_id:
             return {'result': todo}
         
-@api.get('/todos')
-def get_todos():
-    return all_todos
+@api.get('/todos') # query parameter - for example todos/?first_n=3
+def get_todos(first_n: int = None): # default value of none
+    if first_n:
+        return all_todos[:first_n]
+    else:
+        return all_todos
