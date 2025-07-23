@@ -29,3 +29,18 @@ def get_todos(first_n: int = None): # default value of none
         return all_todos[:first_n]
     else:
         return all_todos
+
+# SIMPLE POST
+@api.post('/todos')
+def create_todo(todo: dict):
+    new_todo_id = max(todo['todo_id'] for todo in all_todos) + 1
+
+    new_todo = {
+        'todo_id': new_todo_id,
+        'todo_name': todo['todo_name'],
+        'todo_description': todo['todo_description']
+    }
+
+    all_todos.append(new_todo)
+    
+    return new_todo
