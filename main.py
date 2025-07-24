@@ -42,5 +42,15 @@ def create_todo(todo: dict):
     }
 
     all_todos.append(new_todo)
-    
+
     return new_todo
+
+# SIMPLE PUT
+@api.put('/todos/{todo_id}')
+def update_todo(todo_id: int, updated_todo: dict):
+    for todo in all_todos:
+        if todo['todo_id'] == todo_id:
+            todo['todo_name'] = update_todo['todo_name']
+            todo['todo_description'] = update_todo['todo_description']
+            return todo
+    return "Error, not found"
