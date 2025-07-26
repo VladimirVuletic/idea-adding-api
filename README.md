@@ -40,3 +40,23 @@ You already created an API that:
 - Both paths take GET operations (also known as HTTP methods).
 - The path /items/{item_id} has a path parameter item_id that should be an int.
 - The path /items/{item_id} has an optional str query parameter q.
+
+### TESTING THE TABLES
+
+| Name    | Age | City     |
+|---------|-----|----------|
+| Alice   | 30  | London   |
+| Bob     | 25  | Paris    |
+| Charlie | 35  | New York |
+
+
+<table>
+  <thead>
+    <tr><th>Name</th><th>Age</th><th>City</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Alice</td><td>30</td><td>London</td></tr>
+    <tr><td>Bob</td><td>25</td><td>Paris</td></tr>
+    <tr><td>Charlie</td><td>35</td><td>New York</td></tr>
+  </tbody>
+</table>
