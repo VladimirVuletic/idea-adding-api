@@ -1,35 +1,22 @@
-def parse_ideas(markdown: str):
-    lines = markdown.splitlines()
-    # 1) Find where the table header (“| Project Name | …”) sits
-    for i, line in enumerate(lines):
-        if line.strip().startswith("| Project Name"):
-            header_idx = i
-            break
-    else:
-        return []  # no table found
+from bs4 import BeautifulSoup
 
-    # 2) Skip the header and the separator (`|---|---|---|`)
-    data_lines = lines[header_idx+2:]
-    ideas = []
-    for row in data_lines:
-        if not row.strip().startswith("|"):
-            break
-        # strip leading/trailing '|' and split cells
-        cells = [c.strip() for c in row.strip().strip("|").split("|")]
-        # guard against empty rows
-        if len(cells) < 3 or all(not c for c in cells):
-            continue
-        ideas.append({
-            "Project Name":       cells[0],
-            "Short Description":  cells[1],
-            "Long Description":   cells[2],
-        })
-    return ideas
-
-# --- usage ---
 file_path = r"C:/Python projects/future-projects/README.md"
-with open(file_path, 'r', encoding='utf-8') as f:
-    md = f.read()
 
-idea_list = parse_ideas(md)
-print(idea_list)
+with open(file_path, 'r', encoding='utf-8') as file:
+    md_file = file.read()
+
+soup = BeautifulSoup(md_file, 'html.parser')
+table_body = soup.find('tbody')
+table_rows = table_body.find_all('tr')
+
+json_table = []
+for row in table_rows:
+    json_row = {
+        "ID": row.find_all('td')[0].decode_contents()  ,
+        "Project name": row.find_all('td')[1].decode_contents()  ,
+        "Short description": row.find_all('td')[2].decode_contents()  ,
+        "Long description": row.find_all('td')[3].decode_contents()
+    }
+    json_table.append(json_row)
+
+print(json_table)
