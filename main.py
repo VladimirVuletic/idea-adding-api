@@ -1,33 +1,29 @@
 from fastapi import FastAPI
+from bs4 import BeautifulSoup
 
 api = FastAPI()
 
+def get_table():
+    file_path = r"C:/Python projects/future-projects/README.md"
 
+    with open(file_path, 'r', encoding='utf-8') as file:
+        md_file = file.read()
 
-# Pseudo-DB - list of dicts # From a README.md FILE 
-# This is just a test, we shouldn't duplicate logic from another script
-from bs4 import BeautifulSoup
+    soup = BeautifulSoup(md_file, 'html.parser')
+    table_body = soup.find('tbody')
+    table_rows = table_body.find_all('tr')
 
-file_path = r"C:/Python projects/future-projects/README.md"
+    json_table = []
+    for row in table_rows:
+        json_row = {
+            "ID": row.find_all('td')[0].decode_contents(),
+            "Project name": row.find_all('td')[1].decode_contents(),
+            "Short description": row.find_all('td')[2].decode_contents(),
+            "Long description": row.find_all('td')[3].decode_contents()
+        }
+        json_table.append(json_row)
 
-with open(file_path, 'r', encoding='utf-8') as file:
-    md_file = file.read()
-
-soup = BeautifulSoup(md_file, 'html.parser')
-table_body = soup.find('tbody')
-table_rows = table_body.find_all('tr')
-
-json_table = []
-for row in table_rows:
-    json_row = {
-        "ID": row.find_all('td')[0].text,
-        "Project name": row.find_all('td')[1].text,
-        "Short description": row.find_all('td')[2].text,
-        "Long description": row.find_all('td')[3].text
-    }
-    json_table.append(json_row)
-
-
+    return json_table
 
 # GET, POST, PUT, DELETE
 # SIMPLE GET
@@ -37,33 +33,61 @@ def index():
 
 @api.get('/ideas/{id}') # path parameter - i provide the parameter in the path
 def get_idea(id):
+    json_table = get_table()
+
     for idea in json_table:
         if idea['ID'] == id:
             return {'result': idea}
         
 @api.get('/ideas') # query parameter - for example ideas/?first_n=3
 def get_ideas(first_n: int = None): # default value of none
+    json_table = get_table()
+
     if first_n:
         return json_table[:first_n]
     else:
         return json_table
 
 # SIMPLE POST
-"""
+
 @api.post('/ideas')
 def create_idea(idea: dict):
-    new_idea_id = max(idea['idea_id'] for idea in json_table) + 1
+    json_table = get_table()
+    new_idea_id = max(int(idea['ID']) for idea in json_table) + 1
 
     new_idea = {
-        'idea_id': new_idea_id,
-        'idea_name': idea['idea_name'],
-        'idea_description': idea['idea_description']
+        'ID': str(new_idea_id),
+        'Project name': idea['Project name'],
+        'Short description': idea['Short description'],
+        'Long description': idea['Long description']
     }
 
     json_table.append(new_idea)
 
+    file_path = r"C:/Python projects/future-projects/README.md"
+    with open(file_path, 'r', encoding='utf-8') as file: md_file = file.read()
+    soup = BeautifulSoup(md_file, 'html.parser')
+
+    new_tr = soup.new_tag('tr')
+    for field in ("ID", "Project name", "Short description", "Long description"):
+        cell_value = new_idea[field]
+        td = soup.new_tag('td')
+        if '<' in cell_value and '>' in cell_value:
+            fragment = BeautifulSoup(cell_value, 'html.parser')
+            td.append(fragment)
+        else:
+            td.string = cell_value
+        new_tr.append(td)
+
+    table_body = soup.find('tbody')
+    table_body.append(new_tr)
+
+    with open(file_path, 'w', encoding='utf-8') as file:
+        file.write(str(soup))
+
     return new_idea
 
+"""
 # SIMPLE PUT
 @api.put('/ideas/{idea_id}')
 def update_idea(idea_id: int, updated_idea: dict):
