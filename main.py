@@ -34,16 +34,19 @@ def change_file(json_table):
     table_body = soup.find('tbody')
 
     new_tbody = soup.new_tag('tbody')
+
+    id = 1
     for row in json_table:
         new_tr = soup.new_tag('tr')
-
         for field in ("ID", "Project name", "Short description", "Long description"):
             new_td = soup.new_tag('td')
-            new_td.append(row[field])
+            if field == "ID":
+                new_td.append(str(id))
+                id = id + 1
+            else:
+                new_td.append(row[field])
             new_tr.append(new_td)
-        
         new_tbody.append(new_tr)
-
     table_body.replace_with(new_tbody)
 
     with open(file_path, 'w', encoding='utf-8') as file:
