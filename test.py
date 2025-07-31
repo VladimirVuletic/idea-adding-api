@@ -1,7 +1,4 @@
-from fastapi import FastAPI
 from bs4 import BeautifulSoup
-
-api = FastAPI()
 
 def get_table():
     file_path = r"C:/Python projects/future-projects/README.md"
@@ -31,6 +28,8 @@ def change_file(json_table):
         md_file = file.read()
     soup = BeautifulSoup(md_file, 'html.parser')
 
+    print(soup)
+
     table_body = soup.find('tbody')
 
     new_tbody = soup.new_tag('tbody')
@@ -53,12 +52,8 @@ def change_file(json_table):
         file.write(soup.prettify(formatter=None))
 
 # GET, POST, PUT, DELETE
-# SIMPLE GET
-@api.get('/')
-def index():
-    return {"message": "Hello World!"}
 
-@api.get('/ideas/{id}') # path parameter - i provide the parameter in the path
+
 def get_idea(id):
     json_table = get_table()
 
@@ -66,7 +61,6 @@ def get_idea(id):
         if idea['ID'] == id:
             return {'result': idea}
         
-@api.get('/ideas') # query parameter - for example ideas/?first_n=3
 def get_ideas(first_n: int = None): # default value of none
     json_table = get_table()
 
@@ -75,9 +69,7 @@ def get_ideas(first_n: int = None): # default value of none
     else:
         return json_table
 
-# SIMPLE POST
 
-@api.post('/ideas')
 def create_idea(idea: dict):
     json_table = get_table()
     new_idea_id = max(int(idea['ID']) for idea in json_table) + 1
@@ -95,28 +87,6 @@ def create_idea(idea: dict):
 
     return new_idea
 
-"""
-# SIMPLE PUT
-@api.put('/ideas/{idea_id}')
-def update_idea(idea_id: int, updated_idea: dict):
-    for idea in json_table:
-        if idea['idea_id'] == idea_id:
-            idea['idea_name'] = updated_idea['idea_name']
-            idea['idea_description'] = updated_idea['idea_description']
-            return idea
-    return "Error, not found"
-"""
-
-# SIMPLE DELETE
-@api.delete('/ideas/{idea_id}')
-def delete_idea(idea_id: int):
-    json_table = get_table()
-
-    for index, idea in enumerate(json_table):
-        if idea['ID'] == str(idea_id):
-            deleted_idea = json_table.pop(index)
-
-            change_file(json_table)
-
-            return deleted_idea
-    return "Error, not found"
+# print(get_table())
+change_file(get_table())
+# print(get_table())
