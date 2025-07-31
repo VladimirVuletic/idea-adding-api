@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from bs4 import BeautifulSoup
+import subprocess
 
 api = FastAPI()
 
@@ -52,6 +53,22 @@ def change_file(json_table):
     with open(file_path, 'w', encoding='utf-8') as file:
         file.write(soup.prettify(formatter=None))
 
+def run_cmd(cmd, cwd):
+    result = subprocess.run(
+        cmd,
+        cwd=cwd,
+        capture_output=True,
+        text=True,
+        check=True
+    )
+    print(result.stdout)
+
+def push_changes(commit_message):
+    repo_path = f"C:/Python projects/future-projects"
+    run_cmd(['git', 'add', '.'], repo_path)
+    run_cmd(['git', 'commit', '-m', commit_message], repo_path)
+    run_cmd(['git', 'push'], repo_path)
+
 # GET, POST, PUT, DELETE
 # SIMPLE GET
 @api.get('/')
@@ -92,6 +109,7 @@ def create_idea(idea: dict):
     json_table.append(new_idea)
 
     change_file(json_table)
+    push_changes(f"add idea '{idea['Project name']}' | ID: {new_idea_id}")
 
     return new_idea
 
@@ -113,10 +131,11 @@ def delete_idea(idea_id: int):
     json_table = get_table()
 
     for index, idea in enumerate(json_table):
-        if idea['ID'] == str(idea_id):
+        if idea['ID'].strip() == str(idea_id):
             deleted_idea = json_table.pop(index)
 
             change_file(json_table)
+            push_changes(f"delete idea '{deleted_idea['Project name']}' | ID: {deleted_idea['ID']}")
 
             return deleted_idea
     return "Error, not found"
