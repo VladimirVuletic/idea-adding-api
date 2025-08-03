@@ -113,17 +113,22 @@ def create_idea(idea: dict):
 
     return new_idea
 
-"""
 # SIMPLE PUT
 @api.put('/ideas/{idea_id}')
 def update_idea(idea_id: int, updated_idea: dict):
+    json_table = get_table()
     for idea in json_table:
-        if idea['idea_id'] == idea_id:
-            idea['idea_name'] = updated_idea['idea_name']
-            idea['idea_description'] = updated_idea['idea_description']
+        if idea['ID'].strip() == str(idea_id):
+            idea['Project name'] = updated_idea['Project name']
+            idea['Short description'] = updated_idea['Short description']
+            idea['Long description'] = updated_idea['Long description']
+
+            change_file(json_table)
+            push_changes(f"update idea '{idea['Project name']}' | ID: {idea['ID']}")
+
             return idea
     return "Error, not found"
-"""
+
 
 # SIMPLE DELETE
 @api.delete('/ideas/{idea_id}')
