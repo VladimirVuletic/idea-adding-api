@@ -1,11 +1,16 @@
 from fastapi import FastAPI
 from bs4 import BeautifulSoup
+from decouple import config
+
 import subprocess
 
 api = FastAPI()
 
+REPO_PATH = config("REPO_PATH")
+FILE_NAME = config("FILE_NAME")
+
 def get_table():
-    file_path = r"C:/Python projects/future-projects/README.md"
+    file_path = REPO_PATH + FILE_NAME
 
     with open(file_path, 'r', encoding='utf-8') as file:
         md_file = file.read()
@@ -27,7 +32,8 @@ def get_table():
     return json_table
 
 def change_file(json_table):
-    file_path = r"C:/Python projects/future-projects/README.md"
+    file_path = REPO_PATH + FILE_NAME
+
     with open(file_path, 'r', encoding='utf-8') as file:
         md_file = file.read()
     soup = BeautifulSoup(md_file, 'html.parser')
@@ -64,7 +70,8 @@ def run_cmd(cmd, cwd):
     print(result.stdout)
 
 def push_changes(commit_message):
-    repo_path = f"C:/Python projects/future-projects"
+    repo_path = REPO_PATH
+
     run_cmd(['git', 'add', '.'], repo_path)
     run_cmd(['git', 'commit', '-m', commit_message], repo_path)
     run_cmd(['git', 'push'], repo_path)
