@@ -1,13 +1,33 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
 from bs4 import BeautifulSoup
 from decouple import config
 
 import subprocess
+from typing import List, Optional
 
 api = FastAPI()
 
 REPO_PATH = config("REPO_PATH")
 FILE_NAME = config("FILE_NAME")
+
+
+class IdeaBase(BaseModel):
+    name: str = Field(description="Name of the project.")
+    short_description: Optional[str] = Field(default = "", description="Short description of the project.")
+    long_description: Optional[str] = Field(default = "", description="Long description of the project or the link to the project's README.MD")
+
+class Idea(IdeaBase):
+    id: str = Field(..., description="Unique identifier of the project.")
+
+class IdeaCreate(IdeaBase):
+    pass
+
+class IdeaUpdate(BaseModel):
+    name: Optional[str] = Field(None, description="(Optional) Name of the project.")
+    short_description: Optional[str] = Field(None, description="(Optional) Short description.")
+    long_description: Optional[str] = Field(None, description="(Optional) Long description or link.")
+
 
 def get_table():
     file_path = REPO_PATH + FILE_NAME
@@ -19,19 +39,16 @@ def get_table():
     table_body = soup.find('tbody')
     table_rows = table_body.find_all('tr')
 
-    json_table = []
+    ideas_table = []
     for row in table_rows:
-        json_row = {
-            "ID": row.find_all('td')[0].decode_contents(),
-            "Project name": row.find_all('td')[1].decode_contents(),
-            "Short description": row.find_all('td')[2].decode_contents(),
-            "Long description": row.find_all('td')[3].decode_contents()
-        }
-        json_table.append(json_row)
+        idea = Idea(id=row.find_all('td')[0].decode_contents(),
+                        name=row.find_all('td')[1].decode_contents(),
+                        short_description=row.find_all('td')[2].decode_contents(),
+                        long_description=row.find_all('td')[3].decode_contents())
+        ideas_table.append(idea)
+    return ideas_table
 
-    return json_table
-
-def change_file(json_table):
+def change_file(ideas_table):
     file_path = REPO_PATH + FILE_NAME
 
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -43,15 +60,15 @@ def change_file(json_table):
     new_tbody = soup.new_tag('tbody')
 
     id = 1
-    for row in json_table:
+    for row in ideas_table:
         new_tr = soup.new_tag('tr')
-        for field in ("ID", "Project name", "Short description", "Long description"):
+        for field in ("id", "name", "short_description", "long_description"):
             new_td = soup.new_tag('td')
-            if field == "ID":
+            if field == "id":
                 new_td.append(str(id))
                 id = id + 1
             else:
-                new_td.append(row[field])
+                new_td.append(getattr(row, field))
             new_tr.append(new_td)
         new_tbody.append(new_tr)
     table_body.replace_with(new_tbody)
@@ -76,78 +93,73 @@ def push_changes(commit_message):
     run_cmd(['git', 'commit', '-m', commit_message], repo_path)
     run_cmd(['git', 'push'], repo_path)
 
-# GET, POST, PUT, DELETE
-# SIMPLE GET
-@api.get('/')
-def index():
-    return {"message": "Hello World!"}
 
-@api.get('/ideas/{id}') # path parameter - i provide the parameter in the path
+@api.get('/ideas/{id}', response_model=Idea)
 def get_idea(id):
-    json_table = get_table()
-
-    for idea in json_table:
-        if idea['ID'] == id:
-            return {'result': idea}
+    ideas_table = get_table()
+    for idea in ideas_table:
+        if idea.id.strip() == id:
+            return idea
+    
+    raise HTTPException(status_code=404, detail=f"Project with id {id} not found.")
         
-@api.get('/ideas') # query parameter - for example ideas/?first_n=3
-def get_ideas(first_n: int = None): # default value of none
-    json_table = get_table()
+@api.get('/ideas', response_model=List[Idea])
+def get_ideas(first_n: int = None):
+    ideas_table = get_table()
 
     if first_n:
-        return json_table[:first_n]
+        return ideas_table[:first_n]
     else:
-        return json_table
+        return ideas_table
 
-# SIMPLE POST
+@api.post('/ideas', response_model=Idea)
+def create_idea(idea: IdeaCreate):
+    ideas_table = get_table()
+    new_idea_id = max(int(idea.id.strip()) for idea in ideas_table) + 1
 
-@api.post('/ideas')
-def create_idea(idea: dict):
-    json_table = get_table()
-    new_idea_id = max(int(idea['ID']) for idea in json_table) + 1
+    new_idea = Idea(id=str(new_idea_id),
+                    name=idea.name,
+                    short_description=idea.short_description,
+                    long_description=idea.long_description)
 
-    new_idea = {
-        'ID': str(new_idea_id),
-        'Project name': idea['Project name'],
-        'Short description': idea['Short description'],
-        'Long description': idea['Long description']
-    }
+    ideas_table.append(new_idea)
 
-    json_table.append(new_idea)
-
-    change_file(json_table)
-    push_changes(f"add idea '{idea['Project name']}' | ID: {new_idea_id}")
+    change_file(ideas_table)
+    push_changes(f"add idea '{idea.name}' | id: {new_idea_id}")
 
     return new_idea
 
-# SIMPLE PUT
-@api.put('/ideas/{idea_id}')
-def update_idea(idea_id: int, updated_idea: dict):
-    json_table = get_table()
-    for idea in json_table:
-        if idea['ID'].strip() == str(idea_id):
-            idea['Project name'] = updated_idea['Project name']
-            idea['Short description'] = updated_idea['Short description']
-            idea['Long description'] = updated_idea['Long description']
+@api.put('/ideas/{id}', response_model=Idea)
+def update_idea(id: str, updated_idea: IdeaUpdate):
+    ideas_table = get_table()
+    for idea in ideas_table:
+        if idea.id.strip() == id:
+            if updated_idea.name is not None:
+                idea.name = updated_idea.name
+            if updated_idea.short_description is not None:
+                idea.short_description = updated_idea.short_description
+            if updated_idea.long_description is not None:
+                idea.long_description = updated_idea.long_description
 
-            change_file(json_table)
-            push_changes(f"update idea '{idea['Project name']}' | ID: {idea['ID']}")
+            change_file(ideas_table)
+            push_changes(f"update idea '{idea.name}' | id: {idea.name}")
 
             return idea
-    return "Error, not found"
+        
+    raise HTTPException(status_code=404, detail=f"Project with id {id} not found.")
 
 
-# SIMPLE DELETE
-@api.delete('/ideas/{idea_id}')
-def delete_idea(idea_id: int):
-    json_table = get_table()
+@api.delete('/ideas/{id}', response_model=Idea)
+def delete_idea(id: str):
+    ideas_table = get_table()
 
-    for index, idea in enumerate(json_table):
-        if idea['ID'].strip() == str(idea_id):
-            deleted_idea = json_table.pop(index)
+    for index, idea in enumerate(ideas_table):
+        if idea.id.strip() == id:
+            deleted_idea = ideas_table.pop(index)
 
-            change_file(json_table)
-            push_changes(f"delete idea '{deleted_idea['Project name']}' | ID: {deleted_idea['ID']}")
+            change_file(ideas_table)
+            push_changes(f"delete idea '{deleted_idea.name}' | id: {deleted_idea.id}")
 
             return deleted_idea
-    return "Error, not found"
+    
+    raise HTTPException(status_code=404, detail=f"Project with id {id} not found.")
