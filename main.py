@@ -1,10 +1,11 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
-from bs4 import BeautifulSoup
-from decouple import config
-
 import subprocess
 from typing import List, Optional
+
+from bs4 import BeautifulSoup
+from decouple import config
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
+
 
 api = FastAPI()
 
