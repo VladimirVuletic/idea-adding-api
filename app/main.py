@@ -6,17 +6,13 @@ from decouple import config
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
+from schemas.idea_base import IdeaBase
 
 api = FastAPI()
 
 REPO_PATH = config("REPO_PATH")
 FILE_NAME = config("FILE_NAME")
 
-
-class IdeaBase(BaseModel):
-    name: str = Field(description="Name of the project.")
-    short_description: Optional[str] = Field(default = "", description="Short description of the project.")
-    long_description: Optional[str] = Field(default = "", description="Long description of the project or the link to the project's README.MD")
 
 class Idea(IdeaBase):
     id: str = Field(..., description="Unique identifier of the project.")
