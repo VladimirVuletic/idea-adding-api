@@ -1,0 +1,4 @@
+fastapi
+beautifulsoup4
+python-decouple
+pydantic
