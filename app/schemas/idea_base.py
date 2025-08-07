@@ -1,6 +1,6 @@
-from typing import Optional
-
 from pydantic import BaseModel, Field
+
+from typing import Optional
 
 class IdeaBase(BaseModel):
     name: str = Field(description="Name of the project.")

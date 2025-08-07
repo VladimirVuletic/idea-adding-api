@@ -1,6 +1,6 @@
-from typing import List
-
 from fastapi import FastAPI, HTTPException
+
+from typing import List
 
 from schemas.idea import Idea
 from schemas.idea_create import IdeaCreate

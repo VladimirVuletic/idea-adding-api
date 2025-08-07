@@ -1,7 +1,7 @@
-import subprocess
-
 from bs4 import BeautifulSoup
 from decouple import config
+
+import subprocess
 
 from schemas.idea import Idea
 
