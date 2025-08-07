@@ -6,18 +6,14 @@ from decouple import config
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
-from schemas.idea_base import IdeaBase
 from schemas.idea import Idea
+from schemas.idea_create import IdeaCreate
 
 api = FastAPI()
 
 REPO_PATH = config("REPO_PATH")
 FILE_NAME = config("FILE_NAME")
 
-
-
-class IdeaCreate(IdeaBase):
-    pass
 
 class IdeaUpdate(BaseModel):
     name: Optional[str] = Field(None, description="(Optional) Name of the project.")
