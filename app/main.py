@@ -7,6 +7,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 from schemas.idea_base import IdeaBase
+from schemas.idea import Idea
 
 api = FastAPI()
 
@@ -14,8 +15,6 @@ REPO_PATH = config("REPO_PATH")
 FILE_NAME = config("FILE_NAME")
 
 
-class Idea(IdeaBase):
-    id: str = Field(..., description="Unique identifier of the project.")
 
 class IdeaCreate(IdeaBase):
     pass
