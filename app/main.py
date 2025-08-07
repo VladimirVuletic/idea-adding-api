@@ -1,24 +1,18 @@
 import subprocess
-from typing import List, Optional
+from typing import List
 
 from bs4 import BeautifulSoup
 from decouple import config
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
 
 from schemas.idea import Idea
 from schemas.idea_create import IdeaCreate
+from schemas.idea_update import IdeaUpdate
 
 api = FastAPI()
 
 REPO_PATH = config("REPO_PATH")
 FILE_NAME = config("FILE_NAME")
-
-
-class IdeaUpdate(BaseModel):
-    name: Optional[str] = Field(None, description="(Optional) Name of the project.")
-    short_description: Optional[str] = Field(None, description="(Optional) Short description.")
-    long_description: Optional[str] = Field(None, description="(Optional) Long description or link.")
 
 
 def get_table():
