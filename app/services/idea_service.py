@@ -1,15 +1,13 @@
 from bs4 import BeautifulSoup
-from decouple import config
 
 import subprocess
 
 from schemas.idea import Idea
+from core.settings import settings
 
-REPO_PATH = config("REPO_PATH")
-FILE_NAME = config("FILE_NAME")
 
 def get_table():
-    file_path = REPO_PATH + FILE_NAME
+    file_path = settings.REPO_PATH + settings.FILE_NAME
 
     with open(file_path, 'r', encoding='utf-8') as file:
         md_file = file.read()
@@ -28,7 +26,7 @@ def get_table():
     return ideas_table
 
 def change_file(ideas_table):
-    file_path = REPO_PATH + FILE_NAME
+    file_path = settings.REPO_PATH + settings.FILE_NAME
 
     with open(file_path, 'r', encoding='utf-8') as file:
         md_file = file.read()
@@ -66,7 +64,7 @@ def run_cmd(cmd, cwd):
     print(result.stdout)
 
 def push_changes(commit_message):
-    repo_path = REPO_PATH
+    repo_path = settings.REPO_PATH
 
     run_cmd(['git', 'add', '.'], repo_path)
     run_cmd(['git', 'commit', '-m', commit_message], repo_path)
