@@ -7,10 +7,7 @@ from core.settings import settings
 
 
 def get_table():
-    file_path = settings.REPO_PATH + settings.FILE_NAME
-
-    with open(file_path, 'r', encoding='utf-8') as file:
-        md_file = file.read()
+    md_file = read_file()
 
     soup = BeautifulSoup(md_file, 'html.parser')
     table_body = soup.find('tbody')
@@ -24,6 +21,14 @@ def get_table():
                         long_description=row.find_all('td')[3].decode_contents())
         ideas_table.append(idea)
     return ideas_table
+
+def read_file():
+    file_path = settings.REPO_PATH + settings.FILE_NAME
+
+    with open(file_path, 'r', encoding='utf-8') as file:
+        md_file = file.read()
+
+    return md_file
 
 def change_file(ideas_table):
     file_path = settings.REPO_PATH + settings.FILE_NAME
