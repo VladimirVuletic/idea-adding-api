@@ -31,14 +31,10 @@ def read_file():
     return md_file
 
 def change_file(ideas_table):
-    file_path = settings.REPO_PATH + settings.FILE_NAME
+    md_file = read_file()
 
-    with open(file_path, 'r', encoding='utf-8') as file:
-        md_file = file.read()
     soup = BeautifulSoup(md_file, 'html.parser')
-
     table_body = soup.find('tbody')
-
     new_tbody = soup.new_tag('tbody')
 
     id = 1
