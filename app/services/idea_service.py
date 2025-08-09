@@ -30,6 +30,12 @@ def read_file():
 
     return md_file
 
+def write_to_file(soup: BeautifulSoup):
+    file_path = settings.REPO_PATH + settings.FILE_NAME
+
+    with open(file_path, 'w', encoding='utf-8') as file:
+        file.write(soup.prettify(formatter=None))
+
 def change_file(ideas_table):
     md_file = read_file()
 
@@ -51,8 +57,7 @@ def change_file(ideas_table):
         new_tbody.append(new_tr)
     table_body.replace_with(new_tbody)
 
-    with open(file_path, 'w', encoding='utf-8') as file:
-        file.write(soup.prettify(formatter=None))
+    write_to_file(soup)
 
 def run_cmd(cmd, cwd):
     result = subprocess.run(
