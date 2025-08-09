@@ -13,14 +13,14 @@ def get_table():
     table_body = soup.find('tbody')
     table_rows = table_body.find_all('tr')
 
-    ideas_table = []
+    ideas = []
     for row in table_rows:
         idea = Idea(id=row.find_all('td')[0].decode_contents(),
                         name=row.find_all('td')[1].decode_contents(),
                         short_description=row.find_all('td')[2].decode_contents(),
                         long_description=row.find_all('td')[3].decode_contents())
-        ideas_table.append(idea)
-    return ideas_table
+        ideas.append(idea)
+    return ideas
 
 def read_file():
     file_path = settings.REPO_PATH + settings.FILE_NAME
