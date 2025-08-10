@@ -1,0 +1,5 @@
+fastapi
+beautifulsoup4
+pydantic-settings
+pytest
+pytest-mock
