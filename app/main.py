@@ -2,10 +2,10 @@ from fastapi import FastAPI, HTTPException
 
 from typing import List
 
-from schemas.idea import Idea
-from schemas.idea_create import IdeaCreate
-from schemas.idea_update import IdeaUpdate
-from services.idea_service import get_table, change_file, push_changes
+from app.schemas.idea import Idea
+from app.schemas.idea_create import IdeaCreate
+from app.schemas.idea_update import IdeaUpdate
+from app.services.idea_service import get_table, change_file, push_changes
 
 api = FastAPI()
 

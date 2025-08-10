@@ -1,4 +1,4 @@
-from schemas.idea_base import IdeaBase
+from app.schemas.idea_base import IdeaBase
 
 class IdeaCreate(IdeaBase):
     pass

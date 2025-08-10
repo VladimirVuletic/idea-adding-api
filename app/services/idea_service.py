@@ -2,8 +2,8 @@ from bs4 import BeautifulSoup
 
 import subprocess
 
-from schemas.idea import Idea
-from core.settings import settings
+from app.schemas.idea import Idea
+from app.core.settings import settings
 
 
 def get_table():
@@ -67,11 +67,18 @@ def run_cmd(cmd, cwd):
         text=True,
         check=True
     )
-    print(result.stdout)
+
+    return result.stdout
 
 def push_changes(commit_message):
     repo_path = settings.REPO_PATH
 
-    run_cmd(['git', 'add', '.'], repo_path)
-    run_cmd(['git', 'commit', '-m', commit_message], repo_path)
-    run_cmd(['git', 'push'], repo_path)
+    output = []
+    for git_cmd in [
+        ['git', 'add', '.'],
+        ['git', 'commit', '-m', commit_message],
+        ['git', 'push']
+    ]:
+        output.append(run_cmd(git_cmd, repo_path))
+
+    return output
