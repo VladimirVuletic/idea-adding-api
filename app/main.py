@@ -7,9 +7,13 @@ from app.schemas.idea_create import IdeaCreate
 from app.schemas.idea_update import IdeaUpdate
 from app.services.idea_service import get_table, change_file, push_changes
 
-api = FastAPI()
+app = FastAPI()
 
-@api.get('/ideas/{id}', response_model=Idea)
+@app.get('/')
+def read_root():
+    return "Server is running."
+
+@app.get('/ideas/{id}', response_model=Idea)
 def get_idea(id):
     ideas_table = get_table()
     for idea in ideas_table:
@@ -18,7 +22,7 @@ def get_idea(id):
     
     raise HTTPException(status_code=404, detail=f"Project with id {id} not found.")
         
-@api.get('/ideas', response_model=List[Idea])
+@app.get('/ideas', response_model=List[Idea])
 def get_ideas(first_n: int = None):
     ideas_table = get_table()
 
@@ -27,7 +31,7 @@ def get_ideas(first_n: int = None):
     else:
         return ideas_table
 
-@api.post('/ideas', response_model=Idea)
+@app.post('/ideas', response_model=Idea)
 def create_idea(idea: IdeaCreate):
     ideas_table = get_table()
     new_idea_id = max(int(idea.id.strip()) for idea in ideas_table) + 1
@@ -44,7 +48,7 @@ def create_idea(idea: IdeaCreate):
 
     return new_idea
 
-@api.put('/ideas/{id}', response_model=Idea)
+@app.put('/ideas/{id}', response_model=Idea)
 def update_idea(id: str, updated_idea: IdeaUpdate):
     ideas_table = get_table()
     for idea in ideas_table:
@@ -64,7 +68,7 @@ def update_idea(id: str, updated_idea: IdeaUpdate):
     raise HTTPException(status_code=404, detail=f"Project with id {id} not found.")
 
 
-@api.delete('/ideas/{id}', response_model=Idea)
+@app.delete('/ideas/{id}', response_model=Idea)
 def delete_idea(id: str):
     ideas_table = get_table()
 
