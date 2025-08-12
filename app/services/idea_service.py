@@ -31,7 +31,7 @@ def read_file():
 
     return md_file
 
-def find_idea_by_id(ideas: List[Idea], id: str) -> Optional[Idea]:
+def find_idea_by_id(id: str, ideas: List[Idea]) -> Optional[Idea]:
     for idea in ideas:
         if idea.id.strip() == id:
             return idea

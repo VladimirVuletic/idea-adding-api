@@ -16,7 +16,7 @@ def test_find_idea_by_id_found():
         Idea(id='X', name='Name of idea X', short_description='short desc for idea X', long_description='long desc for idea X'),
         Idea(id='   9\n', name='Name of idea 9\n', short_description='short desc for idea 9\n', long_description='long desc for idea 9\n'),
     ]
-    result = find_idea_by_id(id="7", ideas=mock_ideas)
+    result = find_idea_by_id("7", mock_ideas)
 
     assert result.id == "7"
     assert result.name == "Name of idea 7"
@@ -25,6 +25,6 @@ def test_find_idea_by_id_found():
 
 
 def test_find_idea_by_id_not_found():
-    result = find_idea_by_id(id="7", ideas=[])
+    result = find_idea_by_id("7", ideas=[])
 
     assert result == None
