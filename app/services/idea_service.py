@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 
 import subprocess
+from typing import List, Optional
 
 from app.schemas.idea import Idea
 from app.core.settings import settings
@@ -29,6 +30,12 @@ def read_file():
         md_file = file.read()
 
     return md_file
+
+def find_idea_by_id(ideas: List[Idea], id: str) -> Optional[Idea]:
+    for idea in ideas:
+        if idea.id.strip() == id:
+            return idea
+    return None
 
 def write_to_file(soup: BeautifulSoup):
     file_path = settings.REPO_PATH + settings.FILE_NAME

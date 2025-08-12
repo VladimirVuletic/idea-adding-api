@@ -5,7 +5,7 @@ from typing import List
 from app.schemas.idea import Idea
 from app.schemas.idea_create import IdeaCreate
 from app.schemas.idea_update import IdeaUpdate
-from app.services.idea_service import get_table, change_file, push_changes
+from app.services.idea_service import get_table, change_file, push_changes, find_idea_by_id
 
 app = FastAPI()
 
@@ -15,11 +15,10 @@ def read_root():
 
 @app.get('/ideas/{id}', response_model=Idea)
 def get_idea(id):
-    ideas_table = get_table()
-    for idea in ideas_table:
-        if idea.id.strip() == id:
-            return idea
-    
+    ideas_table = get_table()               # This is not done
+    idea = find_idea_by_id(ideas_table, id) # These two should be injected
+    if idea:
+        return idea
     raise HTTPException(status_code=404, detail=f"Project with id {id} not found.")
         
 @app.get('/ideas', response_model=List[Idea])
