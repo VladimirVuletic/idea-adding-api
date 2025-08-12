@@ -47,20 +47,21 @@ def create_idea(idea: IdeaCreate):
 @app.put('/ideas/{id}', response_model=Idea)
 def update_idea(id: str, updated_idea: IdeaUpdate, ideas: list[Idea] = Depends(get_table)) -> Idea:
     idea = find_idea_by_id(id, ideas)
-    
-    if idea.id.strip() == id:
-        if updated_idea.name is not None:
-            idea.name = updated_idea.name
-        if updated_idea.short_description is not None:
-            idea.short_description = updated_idea.short_description
-        if updated_idea.long_description is not None:
-            idea.long_description = updated_idea.long_description
 
-        change_file(ideas)
-        push_changes(f"update idea '{idea.name}' | id: {idea.name}")
+    if idea is None:
+        raise HTTPException(status_code=404, detail=f"Project with id {id} not found.")
 
-        return idea
-    raise HTTPException(status_code=404, detail=f"Project with id {id} not found.")
+    if updated_idea.name is not None:
+        idea.name = updated_idea.name
+    if updated_idea.short_description is not None:
+        idea.short_description = updated_idea.short_description
+    if updated_idea.long_description is not None:
+        idea.long_description = updated_idea.long_description
+
+    change_file(ideas)
+    push_changes(f"update idea '{idea.name}' | id: {idea.name}")
+
+    return idea
 
 
 @app.delete('/ideas/{id}', response_model=Idea)
