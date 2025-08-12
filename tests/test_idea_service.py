@@ -18,6 +18,7 @@ def test_find_idea_by_id_found():
     ]
     result = find_idea_by_id("7", mock_ideas)
 
+    # TODO: I should probably assert an Idea object, not its fields
     assert result.id == "7"
     assert result.name == "Name of idea 7"
     assert result.short_description == "short desc for idea 7"
