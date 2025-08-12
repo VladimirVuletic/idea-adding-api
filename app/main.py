@@ -21,9 +21,7 @@ def get_idea(id: str, ideas: list[Idea] = Depends(get_table)) -> Idea:
     return idea
         
 @app.get('/ideas', response_model=list[Idea])
-def get_ideas(first_n: int = None):
-    ideas = get_table()
-
+def get_ideas(first_n: int = None, ideas: list[Idea] = Depends(get_table)) -> list[Idea]:
     if first_n:
         return ideas[:first_n]
     else:
