@@ -28,10 +28,8 @@ def get_ideas(first_n: int = None, ideas: list[Idea] = Depends(get_table)) -> li
         return ideas
 
 @app.post('/ideas', response_model=Idea)
-def create_idea(idea: IdeaCreate):
-    ideas = get_table()
+def create_idea(idea: IdeaCreate, ideas: list[Idea] = Depends(get_table)) -> Idea:
     new_idea_id = max(int(idea.id.strip()) for idea in ideas) + 1
-
     new_idea = Idea(id=str(new_idea_id),
                     name=idea.name,
                     short_description=idea.short_description,
