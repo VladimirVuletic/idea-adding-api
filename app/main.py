@@ -64,16 +64,16 @@ def update_idea(id: str, updated_idea: IdeaUpdate, ideas: list[Idea] = Depends(g
 
 
 @app.delete('/ideas/{id}', response_model=Idea)
-def delete_idea(id: str):
-    ideas = get_table()
+def delete_idea(id: str, ideas: list[Idea] = Depends(get_table)) -> Idea:
+    idea = find_idea_by_id(id, ideas)
 
-    for index, idea in enumerate(ideas):
-        if idea.id.strip() == id:
-            deleted_idea = ideas.pop(index)
+    if idea is None:
+        raise HTTPException(status_code=404, detail=f"Project with id {id} not found.")
 
-            change_file(ideas)
-            push_changes(f"delete idea '{deleted_idea.name}' | id: {deleted_idea.id}")
+    deleted_idea = idea
+    ideas.remove(idea)
 
-            return deleted_idea
-    
-    raise HTTPException(status_code=404, detail=f"Project with id {id} not found.")
+    change_file(ideas)
+    push_changes(f"delete idea '{deleted_idea.name}' | id: {deleted_idea.id}")
+
+    return deleted_idea
