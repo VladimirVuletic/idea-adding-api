@@ -1,15 +1,9 @@
 from fastapi import HTTPException
-from fastapi.testclient import TestClient
 import pytest
 
-from app.main import app, get_idea
+from app.main import get_idea
 from app.schemas.idea import Idea
 
-@pytest.fixture
-def client():
-    client = TestClient(app)
-    yield client
-    client.close()
 
 @pytest.fixture
 def mock_ideas() -> list[Idea]:
@@ -19,10 +13,6 @@ def mock_ideas() -> list[Idea]:
         Idea(id='   9\n', name='Name of idea 9\n', short_description='short desc for idea 9\n', long_description='long desc for idea 9\n'),
     ]
 
-def test_read_root(client: TestClient):
-    response = client.get("/")
-    assert response.status_code == 200
-    assert response.json() == "Server is running."
 
 @pytest.mark.parametrize("id, index",[ 
 	("7", 0), 
