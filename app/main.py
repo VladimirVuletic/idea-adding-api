@@ -14,9 +14,11 @@ def read_root():
 @app.get('/ideas/{id}', response_model=Idea)
 def get_idea(id: str, ideas: list[Idea] = Depends(get_table)) -> Idea:
     idea = find_idea_by_id(id, ideas)
-    if idea:
-        return idea
-    raise HTTPException(status_code=404, detail=f"Project with id {id} not found.")
+
+    if idea is None:
+        raise HTTPException(status_code=404, detail=f"Project with id {id} not found.")
+ 
+    return idea
         
 @app.get('/ideas', response_model=list[Idea])
 def get_ideas(first_n: int = None):
