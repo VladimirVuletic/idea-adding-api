@@ -1,6 +1,4 @@
-from fastapi import FastAPI, HTTPException
-
-from typing import List
+from fastapi import Depends, FastAPI, HTTPException
 
 from app.schemas.idea import Idea
 from app.schemas.idea_create import IdeaCreate
@@ -14,14 +12,13 @@ def read_root():
     return "Server is running."
 
 @app.get('/ideas/{id}', response_model=Idea)
-def get_idea(id):
-    ideas = get_table()               # This is not done
-    idea = find_idea_by_id(ideas, id) # These two should be injected
+def get_idea(id: str, ideas: list[Idea] = Depends(get_table)) -> Idea:
+    idea = find_idea_by_id(ideas, id)
     if idea:
         return idea
     raise HTTPException(status_code=404, detail=f"Project with id {id} not found.")
         
-@app.get('/ideas', response_model=List[Idea])
+@app.get('/ideas', response_model=list[Idea])
 def get_ideas(first_n: int = None):
     ideas = get_table()
 
