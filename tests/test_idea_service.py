@@ -1,6 +1,7 @@
 from app.services.idea_service import run_cmd, find_idea_by_id
 from app.schemas.idea import Idea
 
+
 def test_run_cmd():
     cmd = ["cmd", "/c", "echo", "Something"]
     cwd = f"C:\\Python projects\\idea-adding-api"
