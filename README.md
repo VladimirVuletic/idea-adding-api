@@ -7,3 +7,8 @@
 REPO_PATH=...       # Path to your repo root
 FILE_NAME=...       # Markdown file with the ideas table
 ```
+
+## To-do
+1. Add integration tests for every endpoint
+2. Add all unit test
+3. Introduce a DB
