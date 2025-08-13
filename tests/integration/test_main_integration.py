@@ -53,7 +53,8 @@ def test_get_idea_not_found(client: TestClient, id):
     assert response.status_code == 404
     assert response.json() == {"detail": f"Project with id {id} not found."}
 
-def test_get_all_ideas(client: TestClient, mock_ideas):
+def test_get_all_ideas_no_query_parameter(client: TestClient, mock_ideas):
     response = client.get("/ideas")
     assert response.status_code == 200
     assert response.json() == jsonable_encoder(mock_ideas)
+
