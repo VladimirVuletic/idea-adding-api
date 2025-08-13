@@ -74,3 +74,9 @@ def test_get_no_ideas_query_parameter_zero(client: TestClient):
     response = client.get(f"/ideas?first_n=0")
     assert response.status_code == 200
     assert response.json() == jsonable_encoder([])
+
+def test_get_ideas_negative_parameter(client: TestClient):
+    query_parameter = -1
+    response = client.get(f"/ideas?first_n={query_parameter}")
+    assert response.status_code == 400
+    assert response.json() == {"detail": f"Invalid query parameter: {query_parameter}."}
