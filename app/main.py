@@ -1,5 +1,7 @@
 from fastapi import Depends, FastAPI, HTTPException
 
+from typing import Optional
+
 from app.schemas.idea import Idea
 from app.schemas.idea_create import IdeaCreate
 from app.schemas.idea_update import IdeaUpdate
@@ -21,11 +23,14 @@ def get_idea(id: str, ideas: list[Idea] = Depends(get_table)) -> Idea:
     return idea
         
 @app.get('/ideas', response_model=list[Idea])
-def get_ideas(first_n: int = None, ideas: list[Idea] = Depends(get_table)) -> list[Idea]:
-    if first_n:
-        return ideas[:first_n]
-    else:
-        return ideas
+def get_ideas(first_n: Optional[int] = None, ideas: list[Idea] = Depends(get_table)) -> list[Idea]:
+    if first_n is None:
+        first_n = len(ideas)
+    
+    if first_n < 0:
+        raise HTTPException(status_code=400, detail=f"Invalid query parameter: {first_n}.")
+
+    return ideas[:first_n]
 
 @app.post('/ideas', response_model=Idea)
 def create_idea(idea: IdeaCreate, ideas: list[Idea] = Depends(get_table)) -> Idea:
