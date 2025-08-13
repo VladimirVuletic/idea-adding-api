@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 
 import subprocess
-from typing import List, Optional
+from typing import Optional
 
 from app.schemas.idea import Idea
 from app.core.settings import settings
@@ -31,7 +31,7 @@ def read_file():
 
     return md_file
 
-def find_idea_by_id(id: str, ideas: List[Idea]) -> Optional[Idea]:
+def find_idea_by_id(id: str, ideas: list[Idea]) -> Optional[Idea]:
     for idea in ideas:
         if idea.id.strip() == id:
             return idea
