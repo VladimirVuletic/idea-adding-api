@@ -7,7 +7,7 @@ from app.schemas.idea import Idea
 from app.core.settings import settings
 
 
-def get_table():
+def get_table() -> list[Idea]:
     md_file = read_file()
 
     soup = BeautifulSoup(md_file, 'html.parser')
