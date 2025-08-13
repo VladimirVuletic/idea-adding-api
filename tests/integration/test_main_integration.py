@@ -20,6 +20,12 @@ def mock_ideas() -> list[Idea]:
         Idea(id='   9\n', name='Name of idea 9\n', short_description='short desc for idea 9\n', long_description='long desc for idea 9\n'),
     ]
 
+@pytest.fixture(autouse=True)
+def override_get_table(mock_ideas):
+    app.dependency_overrides[get_table] = lambda: mock_ideas
+    yield
+    app.dependency_overrides.clear()
+
 
 def test_read_root(client: TestClient):
     response = client.get("/")
@@ -31,36 +37,23 @@ def test_read_root(client: TestClient):
 	("X", 1),
     ("9", 2)
 ]) 
-def test_get_idea_found(client: TestClient, id, index, mock_ideas):
-    app.dependency_overrides[get_table] = lambda: mock_ideas
-    
+def test_get_idea_found(client: TestClient, id, index, mock_ideas):    
     response = client.get(f"/ideas/{id}")
     assert response.status_code == 200
     assert response.json() == jsonable_encoder(mock_ideas[index])
 
-    app.dependency_overrides.clear()
-
-
 @pytest.mark.parametrize("id",[ 
 	("  "), 
 	("-1"),
-    ("7 7")
+    ("7 7"),
+    ("1")
 ]) 
-def test_get_idea_not_found(client: TestClient, id, mock_ideas):
-    app.dependency_overrides[get_table] = lambda: mock_ideas
+def test_get_idea_not_found(client: TestClient, id):    
     response = client.get(f"/ideas/{id}")
-
     assert response.status_code == 404
     assert response.json() == {"detail": f"Project with id {id} not found."}
 
-    app.dependency_overrides.clear()
-
-
 def test_get_all_ideas(client: TestClient, mock_ideas):
-    app.dependency_overrides[get_table] = lambda: mock_ideas
-
     response = client.get("/ideas")
     assert response.status_code == 200
     assert response.json() == jsonable_encoder(mock_ideas)
-
-    app.dependency_overrides.clear()
