@@ -33,16 +33,10 @@ def test_read_root(client: TestClient):
 ]) 
 def test_get_idea_found(client: TestClient, id, index, mock_ideas):
     app.dependency_overrides[get_table] = lambda: mock_ideas
+    
     response = client.get(f"/ideas/{id}")
-
-    idea_json = response.json()
-    mock_idea = mock_ideas[index]
-
     assert response.status_code == 200
-    assert idea_json["id"] == mock_idea.id
-    assert idea_json["name"] == mock_idea.name
-    assert idea_json["short_description"] == mock_idea.short_description
-    assert idea_json["long_description"] == mock_idea.long_description
+    assert response.json() == jsonable_encoder(mock_ideas[index])
 
     app.dependency_overrides.clear()
 
