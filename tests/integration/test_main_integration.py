@@ -1,3 +1,4 @@
+from fastapi.encoders import jsonable_encoder
 from fastapi.testclient import TestClient
 import pytest
 
@@ -66,7 +67,6 @@ def test_get_all_ideas(client: TestClient, mock_ideas):
 
     response = client.get("/ideas")
     assert response.status_code == 200
-    assert len(response.json()) == len(mock_ideas)
-    assert response.json()[0]['id'] == mock_ideas[0].id
+    assert response.json() == jsonable_encoder(mock_ideas)
 
     app.dependency_overrides.clear()
