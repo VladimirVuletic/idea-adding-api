@@ -59,3 +59,14 @@ def test_get_idea_not_found(client: TestClient, id, mock_ideas):
     assert response.json() == {"detail": f"Project with id {id} not found."}
 
     app.dependency_overrides.clear()
+
+
+def test_get_all_ideas(client: TestClient, mock_ideas):
+    app.dependency_overrides[get_table] = lambda: mock_ideas
+
+    response = client.get("/ideas")
+    assert response.status_code == 200
+    assert len(response.json()) == len(mock_ideas)
+    assert response.json()[0]['id'] == mock_ideas[0].id
+
+    app.dependency_overrides.clear()
