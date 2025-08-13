@@ -69,3 +69,8 @@ def test_get_all_ideas_query_parameter_larger_than_list_len(client: TestClient, 
     response = client.get(f"/ideas?first_n={query_parameter}")
     assert response.status_code == 200
     assert response.json() == jsonable_encoder(mock_ideas)
+
+def test_get_no_ideas_query_parameter_zero(client: TestClient):
+    response = client.get(f"/ideas?first_n=0")
+    assert response.status_code == 200
+    assert response.json() == jsonable_encoder([])
