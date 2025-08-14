@@ -1,0 +1,66 @@
+from fastapi.encoders import jsonable_encoder
+from fastapi.testclient import TestClient
+import pytest
+
+from app.main import app, get_table
+from app.schemas.idea import Idea
+
+
+@pytest.fixture
+def client():
+    client = TestClient(app)
+    yield client
+    client.close()
+
+@pytest.fixture
+def mock_ideas() -> list[Idea]:
+    return [
+        Idea(id='7', name='Name of idea 7', short_description='short desc for idea 7', long_description='long desc for idea 7'),
+        Idea(id='\n   X', name='Name of idea X', short_description='short desc for idea X', long_description='long desc for idea X'),
+        Idea(id='   9\n', name='Name of idea 9\n', short_description='short desc for idea 9\n', long_description='long desc for idea 9\n'),
+    ]
+
+@pytest.fixture(autouse=True)
+def override_get_table(mock_ideas):
+    app.dependency_overrides[get_table] = lambda: mock_ideas
+    yield
+    app.dependency_overrides.clear()
+
+
+@pytest.mark.parametrize("id, index",[ 
+	("7", 0), 
+	("X", 1),
+    ("9", 2)
+]) 
+def test_get_idea_found(client: TestClient, id, index, mock_ideas):    
+    response = client.get(f"/ideas/{id}")
+    assert response.status_code == 200
+    assert response.json() == jsonable_encoder(mock_ideas[index])
+
+@pytest.mark.parametrize("id",[ 
+	("  "), 
+	("-1"),
+    ("7 7"),
+    ("1"),
+    (True),
+    (False)
+]) 
+def test_get_idea_not_found(client: TestClient, id):    
+    response = client.get(f"/ideas/{id}")
+    assert response.status_code == 404
+    assert response.json() == {"detail": f"Project with id {id} not found."}
+
+@pytest.mark.parametrize("id",[ 
+	("7"), 
+	("X"),
+    ("7 7"),
+    (True)
+]) 
+def test_get_idea_from_empty_list(client: TestClient, id):
+    app.dependency_overrides[get_table] = lambda: []
+    try:
+        response = client.get(f"/ideas/{id}")
+        assert response.status_code == 404
+        assert response.json() == {"detail": f"Project with id {id} not found."}
+    finally:
+        app.dependency_overrides.clear()
