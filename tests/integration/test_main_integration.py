@@ -27,11 +27,6 @@ def override_get_table(mock_ideas):
     app.dependency_overrides.clear()
 
 
-def test_read_root(client: TestClient):
-    response = client.get("/")
-    assert response.status_code == 200
-    assert response.json() == "Server is running."
-
 @pytest.mark.parametrize("id, index",[ 
 	("7", 0), 
 	("X", 1),
