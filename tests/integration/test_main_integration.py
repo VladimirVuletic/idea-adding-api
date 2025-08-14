@@ -53,6 +53,20 @@ def test_get_idea_not_found(client: TestClient, id):
     assert response.status_code == 404
     assert response.json() == {"detail": f"Project with id {id} not found."}
 
+@pytest.mark.parametrize("id",[ 
+	("7"), 
+	("X"),
+    ("7 7")
+]) 
+def test_get_idea_from_empty_list(client: TestClient, id):
+    app.dependency_overrides[get_table] = lambda: []
+    try:
+        response = client.get(f"/ideas/{id}")
+        assert response.status_code == 404
+        assert response.json() == {"detail": f"Project with id {id} not found."}
+    finally:
+        app.dependency_overrides.clear()
+
 def test_get_all_ideas_no_query_parameter(client: TestClient, mock_ideas):
     response = client.get("/ideas")
     assert response.status_code == 200
