@@ -46,7 +46,9 @@ def test_get_idea_found(client: TestClient, id, index, mock_ideas):
 	("  "), 
 	("-1"),
     ("7 7"),
-    ("1")
+    ("1"),
+    (True),
+    (False)
 ]) 
 def test_get_idea_not_found(client: TestClient, id):    
     response = client.get(f"/ideas/{id}")
@@ -56,7 +58,8 @@ def test_get_idea_not_found(client: TestClient, id):
 @pytest.mark.parametrize("id",[ 
 	("7"), 
 	("X"),
-    ("7 7")
+    ("7 7"),
+    (True)
 ]) 
 def test_get_idea_from_empty_list(client: TestClient, id):
     app.dependency_overrides[get_table] = lambda: []
@@ -99,7 +102,9 @@ def test_get_ideas_negative_parameter(client: TestClient):
 	("  "), 
 	("s"),
     ("!"),
-    ("..")
+    (".."),
+    (True),
+    (False)
 ]) 
 def test_get_ideas_non_int_parameter(client: TestClient, query_parameter):
     response = client.get(f"/ideas?first_n={query_parameter}")
