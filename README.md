@@ -10,7 +10,7 @@ FILE_NAME=...       # Markdown file with the ideas table
 
 ## To-do
 1. Add integration tests for every endpoint
-2. Add all unit test
+2. Add all unit tests
 3. Introduce a DB
 4. Authentication
 5. Logging?
