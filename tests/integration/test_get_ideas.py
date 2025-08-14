@@ -27,8 +27,6 @@ def override_get_table(mock_ideas):
     app.dependency_overrides.clear()
 
 
-
-
 def test_get_all_ideas_no_query_parameter(client: TestClient, mock_ideas):
     response = client.get("/ideas")
     assert response.status_code == 200
