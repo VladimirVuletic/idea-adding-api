@@ -10,6 +10,8 @@ FILE_NAME=...       # Markdown file with the ideas table
 
 ## To-do
 1. Add integration tests for every endpoint
+   - first_n as a float (1.0), and first_n as a negative float (-1.0) — Should not truncate: expect 422 or 400 per your API contract.
+   - Path param with special characters (URL encoded) and multi-byte unicode id to ensure normalization/strip logic
 2. Group integration tests by endpoint/behavior
 3. Add all unit tests
 4. Introduce a DB
