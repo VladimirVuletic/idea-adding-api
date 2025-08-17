@@ -8,7 +8,7 @@ class IdeasFile:
     def __init__(self, file_path: str = None):
         self.file_path = file_path if file_path else settings.REPO_PATH + settings.FILE_NAME
 
-    def read_file(self):
+    def read_file(self): ## Add typing
         with open(self.file_path, 'r', encoding='utf-8') as file:
             md_file = file.read()
 
