@@ -3,12 +3,9 @@ from bs4 import BeautifulSoup
 from app.core.settings import settings
 from app.schemas.idea import Idea
 
-
-
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from app.schemas.idea import Idea
 from app.schemas.idea_create import IdeaCreate
-from app.services.idea_service import get_table, change_file, push_changes
 
 app = FastAPI()
 
