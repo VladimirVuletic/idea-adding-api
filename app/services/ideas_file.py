@@ -11,14 +11,9 @@ app = FastAPI()
 
 
 class IdeasFile:
-    file_path: str
-    md_file: str = None
-    ideas: list[Idea] = []
-
     def __init__(self, file_path: str = None):
         self.file_path = file_path if file_path else settings.REPO_PATH + settings.FILE_NAME
-        self.read_file()
-        self.load_ideas()
+        self.ideas: list[Idea] = []
 
     def add_idea(self, idea: IdeaCreate):
         new_idea_id = max(int(idea.id.strip()) for idea in self.ideas) + 1
@@ -75,11 +70,3 @@ class IdeasFile:
         return self.ideas
 
 ideas_file = IdeasFile()
-
-
-@app.post('/ideas', response_model=Idea)
-def create_idea(new_idea: IdeaCreate, ideas: list[Idea] = ideas_file.get_ideas()) -> Idea:
-
-    added_idea = ideas_file.add_idea(new_idea)
-
-    return added_idea
