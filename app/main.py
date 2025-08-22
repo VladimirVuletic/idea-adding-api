@@ -25,7 +25,9 @@ def get_idea(id: str, ideas_repo: IdeasRepository = Depends(get_ideas_repo)) -> 
     return idea
         
 @app.get('/ideas', response_model=list[Idea])
-def get_ideas(first_n: Optional[int] = None, ideas: list[Idea] = Depends(get_table)) -> list[Idea]:
+def get_ideas(first_n: Optional[int] = None, ideas_repo: IdeasRepository = Depends(get_ideas_repo)) -> list[Idea]:
+    ideas = ideas_repo.get_ideas()
+
     if first_n is None:
         first_n = len(ideas)
     
@@ -35,51 +37,34 @@ def get_ideas(first_n: Optional[int] = None, ideas: list[Idea] = Depends(get_tab
     return ideas[:first_n]
 
 @app.post('/ideas', response_model=Idea)
-def create_idea(idea: IdeaCreate, ideas: list[Idea] = Depends(get_table)) -> Idea:
-    new_idea_id = max(int(idea.id.strip()) for idea in ideas) + 1
-    new_idea = Idea(id=str(new_idea_id),
-                    name=idea.name,
-                    short_description=idea.short_description,
-                    long_description=idea.long_description)
+def create_idea(new_idea: IdeaCreate, ideas_repo: IdeasRepository = Depends(get_ideas_repo)) -> Idea:
+    idea = ideas_repo.add_idea(new_idea)
+    
+    # We'll see how we'll inject this
+    push_changes(f"add idea '{idea.name}' | id: {idea.id}")
 
-    ideas.append(new_idea)
-
-    change_file(ideas)
-    push_changes(f"add idea '{idea.name}' | id: {new_idea_id}")
-
-    return new_idea
+    return idea
 
 @app.put('/ideas/{id}', response_model=Idea)
-def update_idea(id: str, updated_idea: IdeaUpdate, ideas: list[Idea] = Depends(get_table)) -> Idea:
-    idea = find_idea_by_id(id, ideas)
+def update_idea(id: str, updated_idea: IdeaUpdate, ideas_repo: IdeasRepository = Depends(get_ideas_repo)) -> Idea:
+    idea = ideas_repo.update_idea(id, updated_idea)
 
     if idea is None:
         raise HTTPException(status_code=404, detail=f"Project with id {id} not found.")
 
-    if updated_idea.name is not None:
-        idea.name = updated_idea.name
-    if updated_idea.short_description is not None:
-        idea.short_description = updated_idea.short_description
-    if updated_idea.long_description is not None:
-        idea.long_description = updated_idea.long_description
-
-    change_file(ideas)
+    # We'll see how we'll inject this
     push_changes(f"update idea '{idea.name}' | id: {idea.name}")
 
     return idea
 
 
 @app.delete('/ideas/{id}', response_model=Idea)
-def delete_idea(id: str, ideas: list[Idea] = Depends(get_table)) -> Idea:
-    idea = find_idea_by_id(id, ideas)
+def delete_idea(id: str, ideas_repo: IdeasRepository = Depends(get_ideas_repo)) -> Idea:
+    deleted_idea = ideas_repo.delete_idea(id)
 
-    if idea is None:
+    if deleted_idea is None:
         raise HTTPException(status_code=404, detail=f"Project with id {id} not found.")
 
-    deleted_idea = idea
-    ideas.remove(idea)
-
-    change_file(ideas)
     push_changes(f"delete idea '{deleted_idea.name}' | id: {deleted_idea.id}")
 
     return deleted_idea
