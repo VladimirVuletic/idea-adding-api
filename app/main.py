@@ -7,7 +7,7 @@ from app.schemas.idea import Idea
 from app.schemas.idea_create import IdeaCreate
 from app.schemas.idea_update import IdeaUpdate
 from app.services.ideas_repository import IdeasRepository
-from app.services.idea_service import get_table, change_file, push_changes, find_idea_by_id
+from app.services.idea_service import push_changes
 
 app = FastAPI()
 
