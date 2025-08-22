@@ -10,6 +10,22 @@ from app.schemas.idea_update import IdeaUpdate
 # We should have file repo and db repo btw
 
 class IdeasRepository():
+    def get_idea(self, id: str) -> Optional[Idea]:
+        raise NotImplementedError
+    
+    def get_ideas(self) -> list[Idea]:
+        raise NotImplementedError
+    
+    def add_idea(self, new_idea: IdeaCreate) -> Optional[Idea]:
+        raise NotImplementedError
+    
+    def update_idea(self, id: str, updated_idea: IdeaUpdate) -> Optional[Idea]:
+        raise NotImplementedError
+    
+    def delete_idea(self, id: str) -> Optional[Idea]:
+        raise NotImplementedError
+    
+class IdeasFileRepository(IdeasRepository):
     def __init__(self, file_path: str = None):
         self.file_path = file_path if file_path else settings.REPO_PATH + settings.FILE_NAME
         self._ideas: Optional[list[Idea]] = None

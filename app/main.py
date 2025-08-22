@@ -2,7 +2,7 @@ from fastapi import Depends, FastAPI, HTTPException
 
 from typing import Optional
 
-from app.core.dependencies import get_ideas_repo
+from app.core.dependencies import get_ideas_file_repo
 from app.schemas.idea import Idea
 from app.schemas.idea_create import IdeaCreate
 from app.schemas.idea_update import IdeaUpdate
@@ -16,7 +16,7 @@ def read_root():
     return "Server is running."
 
 @app.get('/ideas/{id}', response_model=Idea)
-def get_idea(id: str, ideas_repo: IdeasRepository = Depends(get_ideas_repo)) -> Idea:
+def get_idea(id: str, ideas_repo: IdeasRepository = Depends(get_ideas_file_repo)) -> Idea:
     idea = ideas_repo.get_idea(id)
 
     if idea is None:
@@ -25,7 +25,7 @@ def get_idea(id: str, ideas_repo: IdeasRepository = Depends(get_ideas_repo)) -> 
     return idea
         
 @app.get('/ideas', response_model=list[Idea])
-def get_ideas(first_n: Optional[int] = None, ideas_repo: IdeasRepository = Depends(get_ideas_repo)) -> list[Idea]:
+def get_ideas(first_n: Optional[int] = None, ideas_repo: IdeasRepository = Depends(get_ideas_file_repo)) -> list[Idea]:
     ideas = ideas_repo.get_ideas()
 
     if first_n is None:
@@ -37,7 +37,7 @@ def get_ideas(first_n: Optional[int] = None, ideas_repo: IdeasRepository = Depen
     return ideas[:first_n]
 
 @app.post('/ideas', response_model=Idea)
-def create_idea(new_idea: IdeaCreate, ideas_repo: IdeasRepository = Depends(get_ideas_repo)) -> Idea:
+def create_idea(new_idea: IdeaCreate, ideas_repo: IdeasRepository = Depends(get_ideas_file_repo)) -> Idea:
     idea = ideas_repo.add_idea(new_idea)
     
     # We'll see how we'll inject this
@@ -46,7 +46,7 @@ def create_idea(new_idea: IdeaCreate, ideas_repo: IdeasRepository = Depends(get_
     return idea
 
 @app.put('/ideas/{id}', response_model=Idea)
-def update_idea(id: str, updated_idea: IdeaUpdate, ideas_repo: IdeasRepository = Depends(get_ideas_repo)) -> Idea:
+def update_idea(id: str, updated_idea: IdeaUpdate, ideas_repo: IdeasRepository = Depends(get_ideas_file_repo)) -> Idea:
     idea = ideas_repo.update_idea(id, updated_idea)
 
     if idea is None:
@@ -59,7 +59,7 @@ def update_idea(id: str, updated_idea: IdeaUpdate, ideas_repo: IdeasRepository =
 
 
 @app.delete('/ideas/{id}', response_model=Idea)
-def delete_idea(id: str, ideas_repo: IdeasRepository = Depends(get_ideas_repo)) -> Idea:
+def delete_idea(id: str, ideas_repo: IdeasRepository = Depends(get_ideas_file_repo)) -> Idea:
     deleted_idea = ideas_repo.delete_idea(id)
 
     if deleted_idea is None:
