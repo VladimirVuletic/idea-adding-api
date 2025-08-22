@@ -1,5 +1,4 @@
-from app.services.idea_service import IdeasRepository
-
+from app.services.ideas_repository import IdeasRepository
 
 def get_ideas_repo() -> IdeasRepository:
     return IdeasRepository()

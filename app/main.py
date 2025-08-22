@@ -2,9 +2,11 @@ from fastapi import Depends, FastAPI, HTTPException
 
 from typing import Optional
 
+from app.core.dependencies import get_ideas_repo
 from app.schemas.idea import Idea
 from app.schemas.idea_create import IdeaCreate
 from app.schemas.idea_update import IdeaUpdate
+from app.services.ideas_repository import IdeasRepository
 from app.services.idea_service import get_table, change_file, push_changes, find_idea_by_id
 
 app = FastAPI()
@@ -14,8 +16,8 @@ def read_root():
     return "Server is running."
 
 @app.get('/ideas/{id}', response_model=Idea)
-def get_idea(id: str, ideas: list[Idea] = Depends(get_table)) -> Idea:
-    idea = find_idea_by_id(id, ideas)
+def get_idea(id: str, ideas_repo: IdeasRepository = Depends(get_ideas_repo)) -> Idea:
+    idea = ideas_repo.get_idea(id)
 
     if idea is None:
         raise HTTPException(status_code=404, detail=f"Project with id {id} not found.")
