@@ -3,11 +3,12 @@ from bs4 import BeautifulSoup
 from typing import Optional
 
 from app.schemas.idea import Idea
+from app.core.settings import settings
 
 
-class  IdeasRepository():
-    def __init__(self, file_path: str):
-        self.file_path = file_path
+class IdeasRepository():
+    def __init__(self, file_path: str = None):
+        self.file_path = file_path if file_path else settings.REPO_PATH + settings.FILE_NAME
         self._ideas: Optional[list[Idea]] = None
 
     def _load(self):
