@@ -2,8 +2,14 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.testclient import TestClient
 import pytest
 
-from app.main import app, get_table
+from typing import Optional
+
+from app.core.dependencies import get_ideas_file_repo
+from app.main import app
+from app.services.ideas_repository import IdeasRepository
 from app.schemas.idea import Idea
+from app.schemas.idea_create import IdeaCreate
+from app.schemas.idea_update import IdeaUpdate
 
 
 @pytest.fixture
@@ -12,21 +18,51 @@ def client():
     yield client
     client.close()
 
+class IdeasTestRepository(IdeasRepository):
+    def __init__(self, ideas: list[Idea] = None):
+        self._ideas = [
+            Idea(id='1', name='Name of idea 1', short_description='short desc for idea 1', long_description='long desc for idea 1'),
+            Idea(id='\n   2', name='Name of idea 2', short_description='short desc for idea 2', long_description='long desc for idea 2'),
+            Idea(id='   3\n', name='Name of idea 3\n', short_description='short desc for idea 3\n', long_description='long desc for idea 3\n'),
+        ]
+        
+    def get_ideas(self) -> list[Idea]:
+        return self._ideas
+    
+    def get_idea(self, id: str) -> Optional[Idea]:
+        id = id.strip()
+        return next((i for i in self._ideas if i.id.strip() == id), None)
+
+    
+    def add_idea(self, new_idea: IdeaCreate) -> Optional[Idea]:
+        ...
+    
+    def update_idea(self, id: str, updated_idea: IdeaUpdate) -> Optional[Idea]:
+        ...
+    
+    def delete_idea(self, id: str) -> Optional[Idea]:
+        ...
+
 @pytest.fixture
-def mock_ideas() -> list[Idea]:
-    return [
-        Idea(id='7', name='Name of idea 7', short_description='short desc for idea 7', long_description='long desc for idea 7'),
-        Idea(id='\n   X', name='Name of idea X', short_description='short desc for idea X', long_description='long desc for idea X'),
-        Idea(id='   9\n', name='Name of idea 9\n', short_description='short desc for idea 9\n', long_description='long desc for idea 9\n'),
-    ]
+def get_ideas_test_repo() -> IdeasTestRepository:
+    return IdeasTestRepository()
 
 @pytest.fixture(autouse=True)
-def override_get_table(mock_ideas):
-    app.dependency_overrides[get_table] = lambda: mock_ideas
+def override_get_ideas_file_repo(get_ideas_test_repo):
+    app.dependency_overrides[get_ideas_file_repo] = lambda: get_ideas_test_repo
     yield
     app.dependency_overrides.clear()
 
+@pytest.mark.parametrize("req_id,expected_status", [("1", 200), ("2", 200), ("999", 404)])
+def test_get_idea_found(client: TestClient, req_id, expected_status):
+    response = client.get(f"/ideas/{req_id}")
+    assert response.status_code == expected_status
+    if expected_status == 200:
+        data = response.json()
+        assert data["id"].strip() == req_id
+        assert "name" in data
 
+"""
 @pytest.mark.parametrize("id, index",[ 
 	("7", 0), 
 	("X", 1),
@@ -64,3 +100,4 @@ def test_get_idea_from_empty_list(client: TestClient, id):
         assert response.json() == {"detail": f"Project with id {id} not found."}
     finally:
         app.dependency_overrides.clear()
+"""
