@@ -64,30 +64,24 @@ def test_get_idea_found(client: TestClient, id, get_ideas_test_repo):
     assert response.status_code == 200
     assert response.json() == jsonable_encoder(get_ideas_test_repo.get_idea(id))
 
-"""
-@pytest.mark.parametrize("id, index",[ 
-	("7", 0), 
-	("X", 1),
-    ("9", 2)
-]) 
-def test_get_idea_found(client: TestClient, id, index, mock_ideas):    
-    response = client.get(f"/ideas/{id}")
-    assert response.status_code == 200
-    assert response.json() == jsonable_encoder(mock_ideas[index])
-
-@pytest.mark.parametrize("id",[ 
-	("  "), 
-	("-1"),
+@pytest.mark.parametrize("id", [
+    ("x"), 
+    ("32"),
+    ("."), # returns 200, should fix
+    (""), # returns 200, should fix
+    (" "),
+    ("-1"),
     ("7 7"),
-    ("1"),
     (True),
     (False)
-]) 
-def test_get_idea_not_found(client: TestClient, id):    
+])
+def test_get_idea_not_found(client: TestClient, id, get_ideas_test_repo):
     response = client.get(f"/ideas/{id}")
+
     assert response.status_code == 404
     assert response.json() == {"detail": f"Project with id {id} not found."}
 
+"""
 @pytest.mark.parametrize("id",[ 
 	("7"), 
 	("X"),
