@@ -75,25 +75,24 @@ def test_get_idea_found(client: TestClient, id, get_ideas_test_repo):
     (True),
     (False)
 ])
-def test_get_idea_not_found(client: TestClient, id, get_ideas_test_repo):
+def test_get_idea_not_found(client: TestClient, id):
     response = client.get(f"/ideas/{id}")
 
     assert response.status_code == 404
     assert response.json() == {"detail": f"Project with id {id} not found."}
 
-"""
+
 @pytest.mark.parametrize("id",[ 
-	("7"), 
+	("1"), 
 	("X"),
-    ("7 7"),
+    ("."), # returns 200, should fix
+    (""), # returns 200, should fix
+    ("2 2"),
     (True)
 ]) 
-def test_get_idea_from_empty_list(client: TestClient, id):
-    app.dependency_overrides[get_table] = lambda: []
-    try:
-        response = client.get(f"/ideas/{id}")
-        assert response.status_code == 404
-        assert response.json() == {"detail": f"Project with id {id} not found."}
-    finally:
-        app.dependency_overrides.clear()
-"""
+def test_get_idea_from_empty_list(client: TestClient, id, get_ideas_test_repo):
+    get_ideas_test_repo._ideas = []
+
+    response = client.get(f"/ideas/{id}")
+    assert response.status_code == 404
+    assert response.json() == {"detail": f"Project with id {id} not found."}
