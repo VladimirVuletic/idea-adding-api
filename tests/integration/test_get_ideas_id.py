@@ -53,14 +53,16 @@ def override_get_ideas_file_repo(get_ideas_test_repo):
     yield
     app.dependency_overrides.clear()
 
-@pytest.mark.parametrize("req_id,expected_status", [("1", 200), ("2", 200), ("999", 404)])
-def test_get_idea_found(client: TestClient, req_id, expected_status):
-    response = client.get(f"/ideas/{req_id}")
-    assert response.status_code == expected_status
-    if expected_status == 200:
-        data = response.json()
-        assert data["id"].strip() == req_id
-        assert "name" in data
+@pytest.mark.parametrize("id", [
+    ("1"), 
+    ("2"), 
+    ("3")
+])
+def test_get_idea_found(client: TestClient, id, get_ideas_test_repo):
+    response = client.get(f"/ideas/{id}")
+
+    assert response.status_code == 200
+    assert response.json() == jsonable_encoder(get_ideas_test_repo.get_idea(id))
 
 """
 @pytest.mark.parametrize("id, index",[ 
