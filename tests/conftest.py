@@ -42,6 +42,10 @@ class IdeasTestRepository(IdeasRepository):
     def delete_idea(self, id: str) -> Optional[Idea]:
         ...
 
+class GitTestClient():
+    def push_changes(self, commit_message):
+        print(f"Fake commit: {commit_message}")
+
 @pytest.fixture
 def get_ideas_test_repo() -> IdeasTestRepository:
     return IdeasTestRepository()
@@ -49,5 +53,15 @@ def get_ideas_test_repo() -> IdeasTestRepository:
 @pytest.fixture(autouse=True)
 def override_get_ideas_file_repo(get_ideas_test_repo):
     app.dependency_overrides[get_ideas_file_repo] = lambda: get_ideas_test_repo
+    yield
+    app.dependency_overrides.clear()
+
+@pytest.fixture
+def get_git_test_client() -> GitTestClient:
+    return GitTestClient()
+
+@pytest.fixture(autouse=True)
+def override_get_git_client(get_git_client):
+    app.dependency_overrides[get_git_client] = lambda: get_git_test_client
     yield
     app.dependency_overrides.clear()
