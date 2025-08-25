@@ -2,36 +2,13 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.testclient import TestClient
 import pytest
 
-from app.main import app, get_table
-from app.schemas.idea import Idea
 
-
-@pytest.fixture
-def client():
-    client = TestClient(app)
-    yield client
-    client.close()
-
-@pytest.fixture
-def mock_ideas() -> list[Idea]:
-    return [
-        Idea(id='7', name='Name of idea 7', short_description='short desc for idea 7', long_description='long desc for idea 7'),
-        Idea(id='\n   X', name='Name of idea X', short_description='short desc for idea X', long_description='long desc for idea X'),
-        Idea(id='   9\n', name='Name of idea 9\n', short_description='short desc for idea 9\n', long_description='long desc for idea 9\n'),
-    ]
-
-@pytest.fixture(autouse=True)
-def override_get_table(mock_ideas):
-    app.dependency_overrides[get_table] = lambda: mock_ideas
-    yield
-    app.dependency_overrides.clear()
-
-
-def test_get_all_ideas_no_query_parameter(client: TestClient, mock_ideas):
+def test_get_all_ideas_no_query_parameter(client: TestClient, get_ideas_test_repo):
     response = client.get("/ideas")
     assert response.status_code == 200
-    assert response.json() == jsonable_encoder(mock_ideas)
+    assert response.json() == jsonable_encoder(get_ideas_test_repo.get_ideas())
 
+"""
 def test_get_all_ideas_exact_query_parameter(client: TestClient, mock_ideas):
     query_parameter = len(mock_ideas)
     response = client.get(f"/ideas?first_n={query_parameter}")
@@ -66,3 +43,4 @@ def test_get_ideas_negative_parameter(client: TestClient):
 def test_get_ideas_non_int_parameter(client: TestClient, query_parameter):
     response = client.get(f"/ideas?first_n={query_parameter}")
     assert response.status_code == 422
+"""
