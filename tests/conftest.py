@@ -3,7 +3,7 @@ import pytest
 
 from typing import Optional
 
-from app.core.dependencies import get_ideas_file_repo
+from app.core.dependencies import get_ideas_file_repo, get_git_client
 from app.main import app
 from app.services.ideas_repository import IdeasRepository
 from app.schemas.idea import Idea
@@ -34,7 +34,17 @@ class IdeasTestRepository(IdeasRepository):
 
     
     def add_idea(self, new_idea: IdeaCreate) -> Optional[Idea]:
-        ...
+        ideas = self.get_ideas()
+
+        idea_id = max(int(idea.id.strip()) for idea in ideas) + 1
+        idea = Idea(id=str(idea_id),
+                        name=new_idea.name,
+                        short_description=new_idea.short_description,
+                        long_description=new_idea.long_description)
+
+        ideas.append(idea)
+
+        return idea
     
     def update_idea(self, id: str, updated_idea: IdeaUpdate) -> Optional[Idea]:
         ...
@@ -61,7 +71,7 @@ def get_git_test_client() -> GitTestClient:
     return GitTestClient()
 
 @pytest.fixture(autouse=True)
-def override_get_git_client(get_git_client):
+def override_get_git_client(get_git_test_client):
     app.dependency_overrides[get_git_client] = lambda: get_git_test_client
     yield
     app.dependency_overrides.clear()

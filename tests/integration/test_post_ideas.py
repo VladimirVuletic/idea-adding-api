@@ -12,5 +12,4 @@ def test_post_idea(client: TestClient, get_ideas_test_repo):
     
     response = client.post("/ideas", json=json)
     assert response.status_code == 200
-    print(response.json())
     assert response.json() == jsonable_encoder(get_ideas_test_repo.get_ideas()[3])
