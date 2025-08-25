@@ -8,13 +8,14 @@ def test_get_all_ideas_no_query_parameter(client: TestClient, get_ideas_test_rep
     assert response.status_code == 200
     assert response.json() == jsonable_encoder(get_ideas_test_repo.get_ideas())
 
-"""
-def test_get_all_ideas_exact_query_parameter(client: TestClient, mock_ideas):
-    query_parameter = len(mock_ideas)
+
+def test_get_all_ideas_exact_query_parameter(client: TestClient, get_ideas_test_repo):
+    query_parameter = len(get_ideas_test_repo.get_ideas())
     response = client.get(f"/ideas?first_n={query_parameter}")
     assert response.status_code == 200
-    assert response.json() == jsonable_encoder(mock_ideas)
+    assert response.json() == jsonable_encoder(get_ideas_test_repo.get_ideas())
 
+"""
 def test_get_all_ideas_query_parameter_larger_than_list_len(client: TestClient, mock_ideas):
     query_parameter = len(mock_ideas) + 5
     response = client.get(f"/ideas?first_n={query_parameter}")
