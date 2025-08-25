@@ -33,7 +33,6 @@ def test_get_ideas_negative_parameter(client: TestClient):
     assert response.status_code == 400
     assert response.json() == {"detail": f"Invalid query parameter: {query_parameter}."}
 
-""""
 @pytest.mark.parametrize("query_parameter",[ 
 	("  "), 
 	("s"),
@@ -45,4 +44,3 @@ def test_get_ideas_negative_parameter(client: TestClient):
 def test_get_ideas_non_int_parameter(client: TestClient, query_parameter):
     response = client.get(f"/ideas?first_n={query_parameter}")
     assert response.status_code == 422
-"""
