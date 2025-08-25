@@ -22,12 +22,12 @@ def test_get_all_ideas_query_parameter_larger_than_list_len(client: TestClient, 
     assert response.json() == jsonable_encoder(get_ideas_test_repo.get_ideas())
 
 
-"""
 def test_get_no_ideas_query_parameter_zero(client: TestClient):
     response = client.get(f"/ideas?first_n=0")
     assert response.status_code == 200
     assert response.json() == jsonable_encoder([])
 
+"""
 def test_get_ideas_negative_parameter(client: TestClient):
     query_parameter = -1
     response = client.get(f"/ideas?first_n={query_parameter}")
