@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 import pytest
 
 
-def test_post_idea(client: TestClient, get_ideas_test_repo):
+def test_post_ideas(client: TestClient, get_ideas_test_repo):
     json = {
         "name": "Testidea",
         "short_description": "test short",
