@@ -32,7 +32,6 @@ class IdeasTestRepository(IdeasRepository):
         id = id.strip()
         return next((i for i in self._ideas if i.id.strip() == id), None)
 
-    
     def add_idea(self, new_idea: IdeaCreate) -> Optional[Idea]:
         ideas = self.get_ideas()
 
@@ -47,7 +46,16 @@ class IdeasTestRepository(IdeasRepository):
         return idea
     
     def update_idea(self, id: str, updated_idea: IdeaUpdate) -> Optional[Idea]:
-        ...
+        idea = self.get_idea(id)
+
+        if updated_idea.name is not None:
+            idea.name = updated_idea.name
+        if updated_idea.short_description is not None:
+            idea.short_description = updated_idea.short_description
+        if updated_idea.long_description is not None:
+            idea.long_description = updated_idea.long_description
+
+        return idea
     
     def delete_idea(self, id: str) -> Optional[Idea]:
         ...
