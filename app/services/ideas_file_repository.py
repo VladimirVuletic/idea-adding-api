@@ -41,20 +41,18 @@ class IdeasFileRepository(IdeasRepository):
         table_body = soup.find('tbody')
         new_tbody = soup.new_tag('tbody')
 
-        id = 1
-        for row in ideas:
-            new_tr = soup.new_tag('tr')
+        for index, row in enumerate(ideas, start=1):
+            new_tr = soup.new_tag("tr")
             for field in ("id", "name", "short_description", "long_description"):
-                new_td = soup.new_tag('td')
+                new_td = soup.new_tag("td")
                 if field == "id":
-                    new_td.append(str(id))
-                    id = id + 1
+                    new_td.append(str(index))
                 else:
                     new_td.append(getattr(row, field))
                 new_tr.append(new_td)
             new_tbody.append(new_tr)
-        table_body.replace_with(new_tbody)
 
+        table_body.replace_with(new_tbody)
         self._write_to_file(soup)
 
     def get_idea(self, id: str) -> Optional[Idea]:
