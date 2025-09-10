@@ -1,14 +1,14 @@
-from fastapi.testclient import TestClient
-import pytest
-
 from typing import Optional
 
-from app.core.dependencies import get_ideas_file_repo, get_git_client
+import pytest
+from fastapi.testclient import TestClient
+
+from app.core.dependencies import get_git_client, get_ideas_file_repo
 from app.main import app
-from app.services.ideas_repository import IdeasRepository
 from app.schemas.idea import Idea
 from app.schemas.idea_create import IdeaCreate
 from app.schemas.idea_update import IdeaUpdate
+from app.services.ideas_repository import IdeasRepository
 
 
 @pytest.fixture

@@ -1,8 +1,8 @@
-from fastapi import Depends, FastAPI, HTTPException
-
 from typing import Optional
 
-from app.core.dependencies import get_ideas_file_repo, get_git_client
+from fastapi import Depends, FastAPI, HTTPException
+
+from app.core.dependencies import get_git_client, get_ideas_file_repo
 from app.schemas.idea import Idea
 from app.schemas.idea_create import IdeaCreate
 from app.schemas.idea_update import IdeaUpdate

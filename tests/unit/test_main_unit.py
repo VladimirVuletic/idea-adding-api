@@ -1,5 +1,5 @@
-from fastapi import HTTPException
 import pytest
+from fastapi import HTTPException
 
 from app.main import get_idea
 from app.schemas.idea import Idea

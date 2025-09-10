@@ -1,6 +1,6 @@
+import pytest
 from fastapi.encoders import jsonable_encoder
 from fastapi.testclient import TestClient
-import pytest
 
 
 def test_get_all_ideas_no_query_parameter(client: TestClient, get_ideas_test_repo):

@@ -1,12 +1,12 @@
-from bs4 import BeautifulSoup
-
 from typing import Optional
 
+from bs4 import BeautifulSoup
+
 from app.core.settings import settings
-from app.services.ideas_repository import IdeasRepository
 from app.schemas.idea import Idea
 from app.schemas.idea_create import IdeaCreate
 from app.schemas.idea_update import IdeaUpdate
+from app.services.ideas_repository import IdeasRepository
 
 
 class IdeasFileRepository(IdeasRepository):

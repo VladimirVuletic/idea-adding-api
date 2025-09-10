@@ -1,6 +1,6 @@
+import pytest
 from fastapi.encoders import jsonable_encoder
 from fastapi.testclient import TestClient
-import pytest
 
 
 @pytest.mark.parametrize("id", [("1"), ("2"), ("3")])

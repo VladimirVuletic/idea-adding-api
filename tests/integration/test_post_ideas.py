@@ -1,6 +1,6 @@
+import pytest
 from fastapi.encoders import jsonable_encoder
 from fastapi.testclient import TestClient
-import pytest
 
 
 def test_post_ideas(client: TestClient, get_ideas_test_repo):
