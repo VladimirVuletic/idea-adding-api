@@ -1,5 +1,6 @@
-fastapi
 beautifulsoup4
+black
+fastapi
 pydantic-settings
 pytest
 pytest-mock
