@@ -8,38 +8,43 @@ from app.schemas.idea import Idea
 from app.schemas.idea_create import IdeaCreate
 from app.schemas.idea_update import IdeaUpdate
 
+
 class IdeasFileRepository(IdeasRepository):
     def __init__(self, file_path: str = None):
-        self.file_path = file_path if file_path else settings.REPO_PATH + settings.FILE_NAME
+        self.file_path = (
+            file_path if file_path else settings.REPO_PATH + settings.FILE_NAME
+        )
         self._ideas: Optional[list[Idea]] = None
 
     def _load(self):
-        soup = BeautifulSoup(self._read_file(), 'html.parser')
-        table_body = soup.find('tbody')
-        table_rows = table_body.find_all('tr')
+        soup = BeautifulSoup(self._read_file(), "html.parser")
+        table_body = soup.find("tbody")
+        table_rows = table_body.find_all("tr")
 
         ideas = []
         for row in table_rows:
-            idea = Idea(id=row.find_all('td')[0].decode_contents(),
-                            name=row.find_all('td')[1].decode_contents(),
-                            short_description=row.find_all('td')[2].decode_contents(),
-                            long_description=row.find_all('td')[3].decode_contents())
+            idea = Idea(
+                id=row.find_all("td")[0].decode_contents(),
+                name=row.find_all("td")[1].decode_contents(),
+                short_description=row.find_all("td")[2].decode_contents(),
+                long_description=row.find_all("td")[3].decode_contents(),
+            )
             ideas.append(idea)
         return ideas
-    
+
     def _read_file(self) -> str:
-        with open(self.file_path, 'r', encoding='utf-8') as file:
+        with open(self.file_path, "r", encoding="utf-8") as file:
             md_file = file.read()
         return md_file
-    
+
     def _write_to_file(self, soup: BeautifulSoup):
-        with open(self.file_path, 'w', encoding='utf-8') as file:
+        with open(self.file_path, "w", encoding="utf-8") as file:
             file.write(soup.prettify(formatter=None))
-    
+
     def _change_file(self, ideas):
-        soup = BeautifulSoup(self._read_file(), 'html.parser')
-        table_body = soup.find('tbody')
-        new_tbody = soup.new_tag('tbody')
+        soup = BeautifulSoup(self._read_file(), "html.parser")
+        table_body = soup.find("tbody")
+        new_tbody = soup.new_tag("tbody")
 
         for index, row in enumerate(ideas, start=1):
             new_tr = soup.new_tag("tr")
@@ -60,26 +65,28 @@ class IdeasFileRepository(IdeasRepository):
             if idea.id.strip() == id:
                 return idea
         return None
-    
+
     def get_ideas(self) -> list[Idea]:
         if self._ideas is None:
             self._ideas = self._load()
         return self._ideas
-    
+
     def add_idea(self, new_idea: IdeaCreate) -> Optional[Idea]:
         ideas = self.get_ideas()
 
         idea_id = max(int(idea.id.strip()) for idea in ideas) + 1
-        idea = Idea(id=str(idea_id),
-                        name=new_idea.name,
-                        short_description=new_idea.short_description,
-                        long_description=new_idea.long_description)
+        idea = Idea(
+            id=str(idea_id),
+            name=new_idea.name,
+            short_description=new_idea.short_description,
+            long_description=new_idea.long_description,
+        )
 
         ideas.append(idea)
         self._change_file(ideas)
 
         return idea
-    
+
     def update_idea(self, id: str, updated_idea: IdeaUpdate) -> Optional[Idea]:
         ideas = self.get_ideas()
         idea = self.get_idea(id)
@@ -94,7 +101,7 @@ class IdeasFileRepository(IdeasRepository):
         self._change_file(ideas)
 
         return idea
-    
+
     def delete_idea(self, id: str) -> Optional[Idea]:
         ideas = self.get_ideas()
         idea = self.get_idea(id)

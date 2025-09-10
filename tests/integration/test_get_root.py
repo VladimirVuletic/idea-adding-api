@@ -9,7 +9,7 @@ def client():
     client = TestClient(app)
     yield client
     client.close()
-    
+
 
 def test_read_root(client: TestClient):
     response = client.get("/")

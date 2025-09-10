@@ -5,9 +5,7 @@ import pytest
 
 def test_put_ideas(client: TestClient, get_ideas_test_repo):
     id = "1"
-    json = {
-        "name": "Name of idea 1 UPDATED"
-    }
+    json = {"name": "Name of idea 1 UPDATED"}
 
     response = client.put(f"/ideas/{id}", json=json)
     assert response.status_code == 200
