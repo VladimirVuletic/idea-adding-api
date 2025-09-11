@@ -13,7 +13,7 @@ app = FastAPI()
 
 
 @app.get("/")
-def read_root():
+def read_root() -> str:
     return "Server is running."
 
 
