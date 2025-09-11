@@ -10,13 +10,13 @@ from app.services.ideas_repository import IdeasRepository
 
 
 class IdeasFileRepository(IdeasRepository):
-    def __init__(self, file_path: str = None):
+    def __init__(self, file_path: str = None) -> None:
         self.file_path = (
             file_path if file_path else settings.REPO_PATH + settings.FILE_NAME
         )
         self._ideas: Optional[list[Idea]] = None
 
-    def _load(self):
+    def _load(self) -> list[Idea]:
         soup = BeautifulSoup(self._read_file(), "html.parser")
         table_body = soup.find("tbody")
         table_rows = table_body.find_all("tr")
@@ -37,11 +37,11 @@ class IdeasFileRepository(IdeasRepository):
             md_file = file.read()
         return md_file
 
-    def _write_to_file(self, soup: BeautifulSoup):
+    def _write_to_file(self, soup: BeautifulSoup) -> None:
         with open(self.file_path, "w", encoding="utf-8") as file:
             file.write(soup.prettify(formatter=None))
 
-    def _change_file(self, ideas):
+    def _change_file(self, ideas: list[Idea]) -> None:
         soup = BeautifulSoup(self._read_file(), "html.parser")
         table_body = soup.find("tbody")
         new_tbody = soup.new_tag("tbody")
