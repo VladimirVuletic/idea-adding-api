@@ -1,7 +1,7 @@
 beautifulsoup4
 black
 fastapi
-isort
 pydantic-settings
 pytest
 pytest-mock
+ruff
